@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+ides_folder="ide_configuration"
+
+if [[ $# -ne 1 ]]; then
+  echo "$0 idea_name"
+fi
+
+if [[ "$1" = "eclipse" ]]; then
+  eclipse_files=(
+    ".cproject" ".project" ".settings"
+  )
+  eclipse_folder="${ides_folder}/eclipse"
+  mkdir -p "$eclipse_folder"
+  cp -a "${eclipse_files[@]}" "$eclipse_folder"
+fi
