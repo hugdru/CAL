@@ -1,0 +1,4 @@
+## Bibliotecas ##
+* boost
+* curl
+* curlpp
