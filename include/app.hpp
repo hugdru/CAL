@@ -6,9 +6,9 @@
 using std::string;
 
 namespace app {
-	namespace defaults {
-		const string graph_file = "graph.out";
-	}
+namespace defaults {
+const string graph_file = "graph.out";
+}
 }
 
 #endif /* APP_HPP_ */

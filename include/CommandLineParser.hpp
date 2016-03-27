@@ -11,7 +11,8 @@ using std::string;
 using std::unordered_map;
 
 namespace std {
-template<class E> struct hash {
+template <class E>
+struct hash {
   inline typename std::enable_if_t<std::is_enum<E>::value, std::size_t>
   operator()(E const value) const {
     return static_cast<typename std::underlying_type_t<E>>(value);
@@ -19,21 +20,23 @@ template<class E> struct hash {
 };
 }
 
-
 class CommandLineParser {
-private:
-	int cardinality;
-	char **arguments;
-	string help = "[(--queryfile|-qf) [--mapfile|-mf]] [(--mapfile|-mf)]";
-public:
-	enum class Options {
-		QUERY_FILE,
-		MAP_FILE,
-	};
-	CommandLineParser(const int cardinality, char **arguments);
-	void error(string error);
-	void error();
-	void parse(unordered_map<Options, string> &options);
+ private:
+  int cardinality;
+  char **arguments;
+  string help = "[(--queryfile|-qf) [--mapfile|-mf]] [(--mapfile|-mf)]";
+
+  void error(string error);
+  void error();
+
+ public:
+  enum class Options {
+    QUERY_FILE_PATH,
+    MAP_FILE_PATH,
+  };
+  CommandLineParser(const int cardinality, char **arguments);
+
+  void parse(unordered_map<Options, string> &options);
 };
 
 #endif /* COMMANDLINEPARSER_HPP_ */
