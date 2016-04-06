@@ -4,3 +4,5 @@ Release
 !ide_configuration/**/.*
 !.gitignore
 **/build/
+**/buildtemp/
+**/bin/
