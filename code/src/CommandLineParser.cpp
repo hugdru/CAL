@@ -14,8 +14,8 @@ static const string queryfile_short = "-qf";
 static unordered_set<string> commandLineFlags{
     {mapfile_long}, {mapfile_short}, {queryfile_long}, {queryfile_short}};
 
-CommandLineParser::CommandLineParser(const int cardinality, char **arguments)
-    : cardinality{cardinality}, arguments{arguments} {}
+CommandLineParser::CommandLineParser(const int cardinality_, char **arguments_)
+    : cardinality{cardinality_}, arguments{arguments_} {}
 
 void CommandLineParser::parse(unordered_map<Options, string> &options) {
   options.clear();

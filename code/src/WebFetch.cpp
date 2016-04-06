@@ -6,8 +6,8 @@
 
 #include <boost/filesystem.hpp>
 
-WebFetch::WebFetch(string url, string output_file)
-    : url{url}, output_file{output_file} {
+WebFetch::WebFetch(string url_, string output_file_)
+    : url{url_}, output_file{output_file_} {
   if (url.empty() || output_file.empty()) {
     throw std::invalid_argument(
         "WebFetch expecting a valid: url, output_file.");

@@ -36,7 +36,7 @@ class QueryFileParser {
 using boost::property_tree::ptree;
 using std::ifstream;
 
-QueryFileParser::QueryFileParser(string query_file) : query_file{query_file} {
+QueryFileParser::QueryFileParser(string query_file_) : query_file{query_file_} {
   if (query_file.empty()) {
     throw std::invalid_argument(
         "QueryFileParser expecting a valid: query_file.");
