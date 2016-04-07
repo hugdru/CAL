@@ -1,0 +1,4 @@
+{
+  "location": "https://www.overpass-api.de/api/interpreter?data=",
+  "query": "[out:json];node[highway=speed_camera](43.46669501043081,-5.708215989569187,43.588927989569186,-5.605835010430813);out;"
+}

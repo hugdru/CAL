@@ -6,3 +6,5 @@ Release
 **/build/
 **/buildtemp/
 **/bin/
+**/*.out
+**/*.map
