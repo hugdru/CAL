@@ -12,11 +12,11 @@ echo 'Type Y when done'
 echo "*********************************************"
 read answer
 if [[ "$answer" = "Y" ]]; then
-	sudo apt-get install build-essential module-assistant
-	sudo m-a prepare
-	additions_folder="$(ls -dvr "/media/$USER/VBOXADDITIONS"* | head -n 1)"
-	echo "Found $additions_folder"
-	sudo sh "${additions_folder}/VBoxLinuxAdditions.run"
+  sudo apt-get install build-essential module-assistant
+  sudo m-a prepare
+  additions_folder="$(ls -dvr "/media/$USER/VBOXADDITIONS"* | head -n 1)"
+  echo "Found $additions_folder"
+  sudo sh "${additions_folder}/VBoxLinuxAdditions.run"
 fi
 
 packages=("git" "git-doc" "libc6" "g++-multilib" "gcc-multilib" "libc++1" "libc++abi1" "libcurl4-gnutls-dev" "libcurlpp-dev" "libboost-all-dev" "autoconf" "libtool-bin")
@@ -41,9 +41,9 @@ sudo make CXXFLAGS='-O2' install
 cd ~
 sudo rm -rf "$tmp_dir"
 
-echo 'Do you want to install Eclipse?'
+echo 'Do you want to install codelite?'
 echo 'Type Y for yes'
-read install_eclipse
-if [[ "$install_eclipse" = "Y" ]]; then
- 	sudo apt-get install "eclipse-cdt"
+read install_codelite
+if [[ "$install_codelite" = "Y" ]]; then
+  sudo apt-get install "codelite" "codelite-plugins"
 fi
