@@ -1,5 +1,7 @@
 #include "WebFetch.hpp"
 
+#include <fstream>
+
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
@@ -27,7 +29,7 @@ WebFetch::Returns WebFetch::fetch() {
     }
   }
 
-  ofstream file;
+  std::ofstream file;
   file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
   file.open(output_file_cstring, ios_base::out | ios_base::trunc);
