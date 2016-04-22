@@ -13,8 +13,8 @@ using std::unordered_map;
 namespace std {
 template <class E>
 struct hash {
-  inline typename std::enable_if_t<std::is_enum<E>::value, int>
-  operator()(E const value) const {
+  inline typename std::enable_if_t<std::is_enum<E>::value, int> operator()(
+      E const value) const {
     return static_cast<typename std::underlying_type_t<E>>(value);
   }
 };
@@ -24,7 +24,9 @@ class CommandLineParser {
  private:
   int cardinality;
   char **arguments;
-  string help = "[(--queryfile|-qf) [--mapfile|-mf]] [(--mapfile|-mf)]";
+  string help =
+      "(--queryfile|-qf) | ( (--maptxtfiles|-mtf) nodesfile roadsfile waysfile "
+      ")";
 
   void error(string error);
   void error();
@@ -32,7 +34,10 @@ class CommandLineParser {
  public:
   enum class Options {
     QUERY_FILE_PATH,
-    MAP_FILE_PATH,
+    QUERY_FILE_OUTPUT_PATH,
+    MAP_NODE_FILE_PATH,
+    MAP_ROAD_FILE_PATH,
+    MAP_WAYS_FILE_PATH
   };
   CommandLineParser(const int cardinality, char **arguments);
 

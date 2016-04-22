@@ -4,6 +4,10 @@
 #include "CommandLineParser.hpp"
 #include "app.hpp"
 #include "QueryFileParser.hpp"
+#include "TxtMapParser.hpp"
+
+static unique_ptr<TxtMapParser> CommandLineParserAnalyzer(
+    unordered_map<CommandLineParser::Options, string> &parsed_options);
 
 int main(int argc, char *argv[]) {
   using std::cout;
@@ -19,13 +23,33 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  unique_ptr<TxtMapParser> txtFileParser =
+      CommandLineParserAnalyzer(parsed_options);
+  if (txtFileParser == nullptr) {
+    return EXIT_SUCCESS;
+  }
+
+  return EXIT_SUCCESS;
+}
+
+static unique_ptr<TxtMapParser> CommandLineParserAnalyzer(
+    unordered_map<CommandLineParser::Options, string> &parsed_options) {
+
   auto end_it = parsed_options.end();
   auto query_it =
       parsed_options.find(CommandLineParser::Options::QUERY_FILE_PATH);
-  auto map_it = parsed_options.find(CommandLineParser::Options::MAP_FILE_PATH);
+  auto query_output_it =
+      parsed_options.find(CommandLineParser::Options::QUERY_FILE_OUTPUT_PATH);
+  auto map_nodes_it =
+      parsed_options.find(CommandLineParser::Options::MAP_NODE_FILE_PATH);
+  auto map_roads_it =
+      parsed_options.find(CommandLineParser::Options::MAP_ROAD_FILE_PATH);
+  auto map_ways_it =
+      parsed_options.find(CommandLineParser::Options::MAP_WAYS_FILE_PATH);
 
-  const string &map_file_path =
-      (map_it != end_it) ? (*map_it).second : app::defaults::graph_file;
+  const string &map_file_path = (query_output_it != end_it)
+                                    ? (*query_output_it).second
+                                    : app::defaults::graph_file;
 
   if (query_it != end_it) {
     try {
@@ -40,13 +64,19 @@ int main(int argc, char *argv[]) {
       WebFetch webfetch{url, map_file_path};
 
       if (webfetch.fetch() != WebFetch::Returns::FETCH_SUCCESS) {
-        cerr << "Failed to fetch openstreetmap data.\n";
+        cerr << "Failed to fetch data.\n";
       }
     } catch (const exception &e) {
       cerr << e.what() << endl;
-      return EXIT_FAILURE;
+      exit(EXIT_FAILURE);
     }
+
+    return nullptr;
   }
 
-  return EXIT_SUCCESS;
+  if (map_nodes_it != end_it) {
+    return unique_ptr<TxtMapParser>(new TxtMapParser{
+        &map_nodes_it->second, &map_roads_it->second, &map_ways_it->second});
+  }
+  return nullptr;
 }
