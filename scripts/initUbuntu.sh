@@ -19,5 +19,31 @@ if [[ "$answer" = "Y" ]]; then
 	sudo sh "${additions_folder}/VBoxLinuxAdditions.run"
 fi
 
-packages=("git" "git-doc" "libc6" "g++-multilib" "gcc-multilib" "libc++1" "libc++abi1" "libcurl4-gnutls-dev" "libcurlpp-dev" "libboost-all-dev" "eclipse-cdt" "clang" "clang-format" "clang-tidy")
+packages=("git" "git-doc" "libc6" "g++-multilib" "gcc-multilib" "libc++1" "libc++abi1" "libcurl4-gnutls-dev" "libcurlpp-dev" "libboost-all-dev" "autoconf" "libtool-bin")
 sudo apt-get install "${packages[@]}"
+
+echo "Downloading Curlpp"
+pkgver="0.7.3"
+curlpp_url="https://github.com/jpbarrette/curlpp/archive/v${pkgver}.tar.gz"
+tmp_dir="/tmp/$USER/curlpp"
+mkdir -p "$tmp_dir"
+
+cd "$tmp_dir"
+output_file="curlpp.tar.gz"
+wget "$curlpp_url" -O "$output_file"
+tar xfz "$output_file"
+cd curlpp-*
+
+echo "Compiling Curlpp"
+./autogen.sh
+./configure --prefix=/usr/local
+sudo make CXXFLAGS='-O2' install
+cd ~
+sudo rm -rf "$tmp_dir"
+
+echo 'Do you want to install Eclipse?'
+echo 'Type Y for yes'
+read install_eclipse
+if [[ "$install_eclipse" = "Y" ]]; then
+ 	sudo apt-get install "eclipse-cdt"
+fi
