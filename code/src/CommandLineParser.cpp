@@ -39,7 +39,7 @@ void CommandLineParser::parse(unordered_map<Options, string> &options) {
       }
       options.insert({Options::MAP_NODE_FILE_PATH, this->arguments[++index]});
       options.insert({Options::MAP_ROAD_FILE_PATH, this->arguments[++index]});
-      options.insert({Options::MAP_WAYS_FILE_PATH, this->arguments[++index]});
+      options.insert({Options::MAP_SUBROADS_FILE_PATH, this->arguments[++index]});
     } else if (commandLineFlag == queryfile_short ||
                commandLineFlag == queryfile_long) {
       if (index + 1 >= this->cardinality) {

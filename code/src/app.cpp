@@ -48,8 +48,8 @@ static unique_ptr<TxtMapParser> CommandLineParserAnalyzer(
       parsed_options.find(CommandLineParser::Options::MAP_NODE_FILE_PATH);
   auto map_roads_it =
       parsed_options.find(CommandLineParser::Options::MAP_ROAD_FILE_PATH);
-  auto map_ways_it =
-      parsed_options.find(CommandLineParser::Options::MAP_WAYS_FILE_PATH);
+  auto map_subroads_it =
+      parsed_options.find(CommandLineParser::Options::MAP_SUBROADS_FILE_PATH);
 
   const string &map_file_path = (query_output_it != end_it)
                                     ? (*query_output_it).second
@@ -80,7 +80,7 @@ static unique_ptr<TxtMapParser> CommandLineParserAnalyzer(
 
   if (map_nodes_it != end_it) {
     return unique_ptr<TxtMapParser>(new TxtMapParser{
-        &map_nodes_it->second, &map_roads_it->second, &map_ways_it->second});
+        &map_nodes_it->second, &map_roads_it->second, &map_subroads_it->second});
   }
   return nullptr;
 }

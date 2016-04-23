@@ -37,7 +37,7 @@ class CommandLineParser {
     QUERY_FILE_OUTPUT_PATH,
     MAP_NODE_FILE_PATH,
     MAP_ROAD_FILE_PATH,
-    MAP_WAYS_FILE_PATH
+    MAP_SUBROADS_FILE_PATH
   };
   CommandLineParser(const int cardinality, char **arguments);
 

@@ -18,12 +18,16 @@ class TxtMapParser {
  private:
   string* nodes_file_path;
   string* roads_file_path;
-  string* ways_file_path;
+  string* subroads_file_path;
   txt_parsed_t parsed;
 
  public:
   TxtMapParser(string* nodes_file_path_, string* roads_file_path_,
-               string* ways_file_path_);
+               string* subroads_file_path_);
+
+  void parse_nodes(void);
+  void parse_roads(void);
+  void parse_subroads(void);
 
   txt_parsed_t parse(void);
 };
