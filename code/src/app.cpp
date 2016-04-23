@@ -29,12 +29,16 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
   }
 
+  TxtMapParser::txt_parsed_t parsed = txtFileParser->parse();
+  for (Node *node_ptr : parsed.node_vector) {
+    std::cout << *node_ptr << std::endl;
+  }
+
   return EXIT_SUCCESS;
 }
 
 static unique_ptr<TxtMapParser> CommandLineParserAnalyzer(
     unordered_map<CommandLineParser::Options, string> &parsed_options) {
-
   auto end_it = parsed_options.end();
   auto query_it =
       parsed_options.find(CommandLineParser::Options::QUERY_FILE_PATH);

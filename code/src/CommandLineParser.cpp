@@ -35,7 +35,7 @@ void CommandLineParser::parse(unordered_map<Options, string> &options) {
     if (commandLineFlag == maptxtfiles_short ||
         commandLineFlag == maptxtfiles_long) {
       if (index + 3 >= this->cardinality) {
-        error(commandLineFlag + " expecting tree arguments.\n");
+        error(commandLineFlag + " expects tree arguments.\n");
       }
       options.insert({Options::MAP_NODE_FILE_PATH, this->arguments[++index]});
       options.insert({Options::MAP_ROAD_FILE_PATH, this->arguments[++index]});
@@ -43,7 +43,7 @@ void CommandLineParser::parse(unordered_map<Options, string> &options) {
     } else if (commandLineFlag == queryfile_short ||
                commandLineFlag == queryfile_long) {
       if (index + 1 >= this->cardinality) {
-        error(commandLineFlag + " expecting one argument.\n");
+        error(commandLineFlag + " expects one argument.\n");
       }
       options.insert({Options::QUERY_FILE_PATH, this->arguments[++index]});
       if (index + 1 < this->cardinality) {

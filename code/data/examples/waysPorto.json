@@ -1,0 +1,4 @@
+{
+  "location" : "http://overpass-api.de/api/interpreter?data=",
+  "query" : "way(41.1463,-8.6483,41.1820,-8.5607);out;"
+}

@@ -1,5 +1,5 @@
-#ifndef GRAPH_H_
-#define GRAPH_H_
+#ifndef GRAPH_HPP_
+#define GRAPH_HPP_
 
 #include <vector>
 #include <queue>

@@ -1,5 +1,5 @@
-#ifndef WebFetch_HPP_
-#define WebFetch_HPP_
+#ifndef WEBFETCH_HPP_
+#define WEBFETCH_HPP_
 
 #include <string>
 
@@ -16,4 +16,4 @@ class WebFetch {
   Returns fetch();
 };
 
-#endif /* WebFetch_HPP_ */
+#endif /* WEBFETCH_HPP_ */
