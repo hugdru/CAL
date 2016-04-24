@@ -3,8 +3,7 @@
 using std::to_string;
 
 Node::Node(long long int id_, double lat_deg, double lon_deg, double lat_rad,
-           double lon_rad) {
-  this->id = id_;
+           double lon_rad) : id{id_} {
   this->coordinates_degrees.latitude = lat_deg;
   this->coordinates_degrees.longitude = lon_deg;
   this->coordinates_radians.latitude = lat_rad;

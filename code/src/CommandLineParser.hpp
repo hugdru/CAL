@@ -25,7 +25,8 @@ class CommandLineParser {
   int cardinality;
   char **arguments;
   string help =
-      "( (--queryfile|-qf) queryfile [outputfile] ) | ( (--maptxtfiles|-mtf) nodesfile roadsfile waysfile "
+      "( (--queryfile|-qf) queryfile [outputfile] ) | ( (--maptxtfiles|-mtf) "
+      "nodesfile roadsfile waysfile "
       ")";
 
   void error(string error);

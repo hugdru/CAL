@@ -4,16 +4,25 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 #include "Node.hpp"
+#include "Road.hpp"
+#include "Subroad.hpp"
 
 using std::string;
 using std::vector;
+using std::unordered_map;
 using std::unique_ptr;
+using std::shared_ptr;
 
 class TxtMapParser {
  public:
-  using txt_parsed_t = struct { vector<Node*> node_vector; };
+  using txt_parsed_t = struct {
+    unordered_map<long long int, shared_ptr<Node>> nodes_umap;
+    unordered_map<long long int, shared_ptr<Road>> roads_umap;
+    vector<shared_ptr<Subroad>> subroads_vector;
+  };
 
  private:
   string* nodes_file_path;

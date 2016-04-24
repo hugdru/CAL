@@ -14,7 +14,7 @@ class Node {
     double latitude;
     double longitude;
   };
-  long long int id;
+  const long long int id;
   coordinates_t coordinates_degrees;
   coordinates_t coordinates_radians;
 

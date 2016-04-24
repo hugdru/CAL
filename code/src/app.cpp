@@ -30,8 +30,14 @@ int main(int argc, char *argv[]) {
   }
 
   TxtMapParser::txt_parsed_t parsed = txtFileParser->parse();
-  for (Node *node_ptr : parsed.node_vector) {
-    std::cout << *node_ptr << std::endl;
+  for (auto &node_ptr : parsed.nodes_umap) {
+    std::cout << *node_ptr.second << std::endl;
+  }
+  for (auto &road_ptr : parsed.roads_umap){
+    std::cout << *road_ptr.second << std::endl;
+  }
+  for (auto &subroad_ptr : parsed.subroads_vector) {
+    std::cout << *subroad_ptr << std::endl;
   }
 
   return EXIT_SUCCESS;
@@ -79,8 +85,9 @@ static unique_ptr<TxtMapParser> CommandLineParserAnalyzer(
   }
 
   if (map_nodes_it != end_it) {
-    return unique_ptr<TxtMapParser>(new TxtMapParser{
-        &map_nodes_it->second, &map_roads_it->second, &map_subroads_it->second});
+    return unique_ptr<TxtMapParser>(new TxtMapParser{&map_nodes_it->second,
+                                                     &map_roads_it->second,
+                                                     &map_subroads_it->second});
   }
   return nullptr;
 }
