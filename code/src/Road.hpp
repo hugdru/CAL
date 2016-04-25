@@ -18,6 +18,8 @@ class Road {
   Road(long long int id_, unique_ptr<string> name, bool is_two_way);
   bool operator==(const Road &otherRoad) const;
   friend ostream &operator<<(ostream &os, Road &road);
+  long long int getId() const;
+  bool isTwoWay() const;
 };
 
 #endif /* ROAD_HPP_ */

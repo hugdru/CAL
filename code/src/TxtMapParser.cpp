@@ -6,8 +6,9 @@
 
 using std::ifstream;
 
-TxtMapParser::TxtMapParser(string *nodes_file_path_, string *roads_file_path_,
-                           string *subroads_file_path_)
+TxtMapParser::TxtMapParser(string const *const nodes_file_path_,
+                           string const *const roads_file_path_,
+                           string const *const subroads_file_path_)
     : nodes_file_path{nodes_file_path_},
       roads_file_path{roads_file_path_},
       subroads_file_path{subroads_file_path_} {}
@@ -39,8 +40,8 @@ void TxtMapParser::parse_nodes(void) {
       double lon_deg = stod(node_arguments[2]);
       double lat_rad = stod(node_arguments[3]);
       double lon_rad = stod(node_arguments[4]);
-      this->parsed.nodes_umap.insert({id,
-          shared_ptr<Node>(new Node{id, lat_deg, lon_deg, lat_rad, lon_rad})});
+      this->parsed.nodes_umap.insert(
+          {id, new Node{id, lat_deg, lon_deg, lat_rad, lon_rad}});
     }
   } else {
     throw std::invalid_argument("Nodes file invalid, failed to open file");
@@ -57,7 +58,10 @@ void TxtMapParser::parse_roads(void) {
       boost::split(road_arguments, road_str, boost::is_any_of(";"));
       auto road_arguments_size = road_arguments.size();
       if (road_arguments_size < 3) {
-        throw std::invalid_argument("A roads file must have at least 3 arguments, " + road_arguments[0] + " has " + std::to_string(road_arguments.size()));
+        throw std::invalid_argument(
+            "A roads file must have at least 3 arguments, " +
+            road_arguments[0] + " has " +
+            std::to_string(road_arguments.size()));
       }
 
       using std::stoll;
@@ -84,12 +88,13 @@ void TxtMapParser::parse_roads(void) {
         is_two_way = false;
       } else {
         throw std::invalid_argument(
-            "A roads file third argument must be either True or False, " + road_arguments[0] + " is " + is_two_way_read);
+            "A roads file third argument must be either True or False, " +
+            road_arguments[0] + " is " + is_two_way_read);
       }
 
-      unique_ptr<string> road_names_str (new string(road_names.str()));
-      this->parsed.roads_umap.insert({id,
-          shared_ptr<Road>(new Road{id, std::move(road_names_str), is_two_way})});
+      unique_ptr<string> road_names_str(new string(road_names.str()));
+      this->parsed.roads_umap.insert(
+          {id, new Road{id, std::move(road_names_str), is_two_way}});
     }
   } else {
     throw std::invalid_argument("Roads file invalid, failed to open file");
@@ -115,9 +120,21 @@ void TxtMapParser::parse_subroads(void) {
       long long int id_node2 = stoll(subroad_arguments[2]);
 
       this->parsed.subroads_vector.push_back(
-          shared_ptr<Subroad>(new Subroad{id_road, id_node1, id_node2}));
+          new Subroad{id_road, id_node1, id_node2});
     }
   } else {
     throw std::invalid_argument("Subroads file invalid, failed to open file");
+  }
+}
+
+TxtMapParser::~TxtMapParser() {
+  for (const auto &node_ptr : this->parsed.nodes_umap) {
+    delete node_ptr.second;
+  }
+  for (const auto &road_ptr : this->parsed.roads_umap) {
+    delete road_ptr.second;
+  }
+  for (const auto &subroad_ptr : this->parsed.subroads_vector) {
+    delete subroad_ptr;
   }
 }

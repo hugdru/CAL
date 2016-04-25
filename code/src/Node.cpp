@@ -1,9 +1,12 @@
 #include "Node.hpp"
 
+#include <cmath>
+
 using std::to_string;
 
 Node::Node(long long int id_, double lat_deg, double lon_deg, double lat_rad,
-           double lon_rad) : id{id_} {
+           double lon_rad)
+    : id{id_} {
   this->coordinates_degrees.latitude = lat_deg;
   this->coordinates_degrees.longitude = lon_deg;
   this->coordinates_radians.latitude = lat_rad;
@@ -12,6 +15,21 @@ Node::Node(long long int id_, double lat_deg, double lon_deg, double lat_rad,
 
 bool Node::operator==(const Node &otherNode) const {
   return this->id == otherNode.id;
+}
+
+double Node::distance(const Node &otherNode) const {
+  using std::abs;
+  static const long long int earth_radius = 6.3685E6;
+  double delta_latitude = abs(this->coordinates_radians.latitude -
+                              otherNode.coordinates_radians.latitude);
+  double delta_longitude = abs(this->coordinates_radians.longitude -
+                               otherNode.coordinates_radians.longitude);
+
+  double perimeter_latitude = delta_latitude * earth_radius;
+  double perimeter_longitude = delta_longitude * earth_radius;
+
+  return std::sqrt(perimeter_latitude * perimeter_longitude +
+                   perimeter_longitude * perimeter_longitude);
 }
 
 ostream &operator<<(ostream &os, Node &node) {
