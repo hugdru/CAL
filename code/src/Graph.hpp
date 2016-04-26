@@ -333,36 +333,38 @@ void Graph<T>::dijkstra(const T& in) {
   for (auto& it_vertex : this->vertexSet) {
     (*it_vertex)->vertex_least_cost = NULL;
     (*it_vertex)->cost = std::numeric_limits<double>::max();
-    (*it_vertex)->processing = false;
+    (*it_vertex)->visited = false;
   }
 
-  Vertex<T>* v = getVertex(in);
-  v->cost = 0;
+  Vertex<T>* selected_vertex = this->getVertex(in);
+  selected_vertex->cost = 0;
 
-  vector<Vertex<T>*> pq;
-  pq.push_back(v);
+  vector<Vertex<T>*> priority_queue;
+  priority_queue.push_back(selected_vertex);
 
-  make_heap(pq.begin(), pq.end());
+  make_heap(priority_queue.begin(), priority_queue.end());
 
-  while (!pq.empty()) {
-    v = pq.front();
-    pop_heap(pq.begin(), pq.end());
-    pq.pop_back();
+  while (!priority_queue.empty()) {
+    selected_vertex = priority_queue.front();
+    pop_heap(priority_queue.begin(), priority_queue.end());
+    priority_queue.pop_back();
 
-    for (unsigned int i = 0; i < v->adjacency_list.size(); i++) {
-      Vertex<T>* w = v->adjacency_list[i].target;
+    for (auto& it_edge : selected_vertex->adjacency_list) {
+      auto& edge = *it_edge;
+      Vertex<T>* target = edge.target;
 
-      if (v->cost + v->adjacency_list[i].weight < w->cost) {
-        w->cost = v->cost + v->adjacency_list[i].weight;
-        w->vertex_least_cost = v;
+      double new_target_cost = selected_vertex->cost + edge.weight;
+      if (new_target_cost < target->cost) {
+        target->cost = new_target_cost;
+        target->vertex_least_cost = selected_vertex;
 
-        // se já estiver na lista, apenas a actualiza
-        if (!w->processing) {
-          w->processing = true;
-          pq.push_back(w);
+        if (!target->visited) {
+          target->visited = true;
+          priority_queue.push_back(target);
         }
 
-        make_heap(pq.begin(), pq.end(), VertexCostGreaterThan<T>());
+        make_heap(priority_queue.begin(), priority_queue.end(),
+                  VertexCostGreaterThan<T>());
       }
     }
   }
