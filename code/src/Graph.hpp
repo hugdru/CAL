@@ -16,9 +16,12 @@ class Graph;
 /* VERTEX */
 template <typename T>
 class Vertex {
+ public:
+  using adjacency_list_t = vector<Edge<T>>;
+
  private:
   T info;
-  vector<Edge<T>> adjacency_list;
+  adjacency_list_t adjacency_list;
   bool visited;
   bool processing;
   double cost;
@@ -35,8 +38,8 @@ class Vertex {
   bool removeEdgeTo(Vertex<T> const* const otherVertex);
 
   T getInfo() const;
-  int getCost() const;
-  vector<Edge<T>> getAdjacencyList() const;
+  double getCost() const;
+  typename Vertex<T>::adjacency_list_t getAdjacencyList() const;
   Vertex<T>* getPath() const;
 };
 
@@ -60,7 +63,8 @@ struct VertexCostGreaterThan {
 
 template <typename T>
 bool Vertex<T>::removeEdgeTo(Vertex<T> const* const otherVertex) {
-  for (auto& it_edge : this->adjacency_list) {
+  for (auto it_edge = this->adjacency_list.begin();
+       it_edge != this->adjacency_list.end(); ++it_edge) {
     if (it_edge->target == otherVertex) {
       this->adjacency_list.erase(it_edge);
       return true;
@@ -89,12 +93,12 @@ T Vertex<T>::getInfo() const {
 }
 
 template <typename T>
-int Vertex<T>::getCost() const {
+double Vertex<T>::getCost() const {
   return this->cost;
 }
 
 template <typename T>
-vector<Edge<T>> Vertex<T>::getAdjacencyList() const {
+typename Vertex<T>::adjacency_list_t Vertex<T>::getAdjacencyList() const {
   return this->adjacency_list;
 }
 
@@ -151,8 +155,9 @@ struct VertexSetGreaterThan {
 /* GRAPH */
 template <typename T>
 class Graph {
-  public:
+ public:
   using VertexSet_t = set<Vertex<T>*, VertexSetGreaterThan<T>>;
+
  private:
   VertexSet_t vertexSet;
   long unsigned int edge_count = 0;
@@ -164,7 +169,7 @@ class Graph {
   vector<T> dfs() const;
   vector<T> bfs(Vertex<T>* v) const;
   void dijkstra(const T& in);
-  void getPathTo(const T& in, list<T>& res) const;
+  void getPathTo(const T& in, list<T>& res);
 
   bool addVertex(const T& in);
   bool addEdge(const T& in_origin, const T& in_target, double weight);
@@ -174,8 +179,11 @@ class Graph {
   typename Graph<T>::VertexSet_t getVertexSet() const;
   long unsigned int getVertexCount() const;
   long unsigned int getEdgeCount() const;
-Vertex<T>* getVertex(const T& in, typename Graph<T>::VertexSet_t::iterator *it_ptr = nullptr, bool erase = false);
+  Vertex<T>* getVertex(
+      const T& in, typename Graph<T>::VertexSet_t::iterator* it_ptr = nullptr,
+      bool erase = false);
   vector<Vertex<T>*> getSources() const;
+  void uniform_cost_search(const T& in, const T& goal);
 };
 
 template <typename T>
@@ -204,14 +212,13 @@ bool Graph<T>::addVertex(const T& in) {
 
 template <typename T>
 bool Graph<T>::removeVertex(const T& in) {
-
   Vertex<T>* vertex_info = this->getVertex(in, nullptr, true);
   if (vertex_info == nullptr) {
     return false;
   }
 
-  for (const auto& it_vertex : this->vertexSet) {
-    (*it_vertex)->removeEdgeTo(vertex_info);
+  for (const auto& vertex_ptr : this->vertexSet) {
+    vertex_ptr->removeEdgeTo(vertex_info);
   }
 
   delete vertex_info;
@@ -220,7 +227,6 @@ bool Graph<T>::removeVertex(const T& in) {
 
 template <typename T>
 bool Graph<T>::addEdge(const T& in_origin, const T& in_target, double weight) {
-
   Vertex<T>* vertex_origin = this->getVertex(in_origin);
   Vertex<T>* vertex_target = this->getVertex(in_target);
   if (vertex_origin == nullptr || vertex_target == nullptr) {
@@ -235,7 +241,6 @@ bool Graph<T>::addEdge(const T& in_origin, const T& in_target, double weight) {
 
 template <typename T>
 bool Graph<T>::removeEdge(const T& in_origin, const T& in_target) {
-
   Vertex<T>* vertex_origin = this->getVertex(in_origin);
   Vertex<T>* vertex_target = this->getVertex(in_target);
   if (vertex_origin == nullptr || vertex_target == nullptr) {
@@ -252,14 +257,14 @@ bool Graph<T>::removeEdge(const T& in_origin, const T& in_target) {
 
 template <typename T>
 vector<T> Graph<T>::dfs() const {
-  for (auto it_vertex : this->vertexSet) {
-    (*it_vertex)->visited = false;
+  for (auto& vertex_ptr : this->vertexSet) {
+    vertex_ptr->visited = false;
   }
 
   vector<T> path_history;
-  for (auto it_vertex : this->vertexSet) {
-    if (!(*it_vertex)->visited) {
-      dfs(*it_vertex, path_history);
+  for (auto vertex_ptr : this->vertexSet) {
+    if (!vertex_ptr->visited) {
+      dfs(vertex_ptr, path_history);
     }
   }
 
@@ -271,9 +276,9 @@ void Graph<T>::dfs(Vertex<T>* vertex, vector<T>& path_history) const {
   vertex->visited = true;
   path_history.push_back(vertex->info);
 
-  for (const auto& it_vertex : vertex->adjacency_list) {
-    if (it_vertex->target->visited == false) {
-      dfs(it_vertex->target, path_history);
+  for (auto& edge : this->adjacency_list) {
+    if (edge.target->visited == false) {
+      dfs(edge.target, path_history);
     }
   }
 }
@@ -290,8 +295,8 @@ vector<T> Graph<T>::bfs(Vertex<T>* vertex) const {
     fringe.pop();
     path_history.push_back(selected_vertex->info);
 
-    for (auto& it_vertex : selected_vertex->adjacency_list) {
-      Vertex<T>* candidate_vertex = it_vertex->target;
+    for (auto& edge : this->adjacency_list) {
+      Vertex<T>* candidate_vertex = edge.target;
       if (!candidate_vertex->visited) {
         candidate_vertex->visited = true;
         fringe.push(candidate_vertex);
@@ -302,7 +307,9 @@ vector<T> Graph<T>::bfs(Vertex<T>* vertex) const {
 }
 
 template <typename T>
-Vertex<T>* Graph<T>::getVertex(const T& in, typename Graph<T>::VertexSet_t::iterator *it_ptr, bool erase) {
+Vertex<T>* Graph<T>::getVertex(const T& in,
+                               typename Graph<T>::VertexSet_t::iterator* it_ptr,
+                               bool erase) {
   auto vertex_in_search = make_shared<Vertex<T>>(in);
 
   auto it_vertex_info = this->vertexSet.find(vertex_in_search.get());
@@ -317,7 +324,7 @@ Vertex<T>* Graph<T>::getVertex(const T& in, typename Graph<T>::VertexSet_t::iter
     *it_ptr = it_vertex_info;
   }
 
-  Vertex<T> *vertex_ptr = *it_vertex_info;
+  Vertex<T>* vertex_ptr = *it_vertex_info;
   if (erase) {
     if (it_ptr != nullptr) {
       *it_ptr = this->vertexSet.end();
@@ -329,13 +336,16 @@ Vertex<T>* Graph<T>::getVertex(const T& in, typename Graph<T>::VertexSet_t::iter
 
 template <typename T>
 void Graph<T>::dijkstra(const T& in) {
-  for (auto& it_vertex : this->vertexSet) {
-    (*it_vertex)->vertex_least_cost = NULL;
-    (*it_vertex)->cost = std::numeric_limits<double>::max();
-    (*it_vertex)->visited = false;
+  for (auto& vertex_ptr : this->vertexSet) {
+    vertex_ptr->vertex_least_cost = NULL;
+    vertex_ptr->cost = std::numeric_limits<double>::max();
+    vertex_ptr->visited = false;
   }
 
   Vertex<T>* selected_vertex = this->getVertex(in);
+  if (selected_vertex == nullptr) {
+    return;
+  }
   selected_vertex->cost = 0;
 
   vector<Vertex<T>*> priority_queue;
@@ -348,8 +358,7 @@ void Graph<T>::dijkstra(const T& in) {
     pop_heap(priority_queue.begin(), priority_queue.end());
     priority_queue.pop_back();
 
-    for (auto& it_edge : selected_vertex->adjacency_list) {
-      auto& edge = *it_edge;
+    for (auto& edge : selected_vertex->adjacency_list) {
       Vertex<T>* target = edge.target;
 
       double new_target_cost = selected_vertex->cost + edge.weight;
@@ -370,10 +379,10 @@ void Graph<T>::dijkstra(const T& in) {
 }
 
 template <typename T>
-void Graph<T>::getPathTo(const T& in, list<T>& path) const {
+void Graph<T>::getPathTo(const T& in, list<T>& path) {
   path.clear();
 
-  Vertex<T> *goal_vertex = this->getVertex(in);
+  Vertex<T>* goal_vertex = this->getVertex(in);
   if (goal_vertex == nullptr) {
     return;
   }

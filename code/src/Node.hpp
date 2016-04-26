@@ -24,6 +24,7 @@ class Node {
   bool operator==(const Node &otherNode) const;
   double distance(const Node &otherNode) const;
   bool operator<(const Node &otherNode) const;
+  long long int getId() const;
   friend ostream &operator<<(ostream &os, Node &node);
 };
 

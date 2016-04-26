@@ -19,7 +19,8 @@ bool Node::operator==(const Node &otherNode) const {
 
 double Node::distance(const Node &otherNode) const {
   using std::abs;
-  static const long long int earth_radius = 6.3685E6;
+  // static const long long int earth_radius = 6.3685E6;
+  static const long long int earth_radius = 1;
   double delta_latitude = abs(this->coordinates_radians.latitude -
                               otherNode.coordinates_radians.latitude);
   double delta_longitude = abs(this->coordinates_radians.longitude -
@@ -30,6 +31,10 @@ double Node::distance(const Node &otherNode) const {
 
   return std::sqrt(perimeter_latitude * perimeter_longitude +
                    perimeter_longitude * perimeter_longitude);
+}
+
+long long int Node::getId() const {
+  return this->id;
 }
 
 bool Node::operator<(const Node &otherNode) const {

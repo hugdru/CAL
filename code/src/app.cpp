@@ -35,16 +35,38 @@ int main(int argc, char *argv[]) {
 
   TxtMapParser::txt_parsed_t parsed_txt = txtFileParser->parse();
   for (const auto &node_ptr : parsed_txt.nodes_umap) {
-    cout << *node_ptr.second << endl;
+    cout << *(node_ptr.second) << endl;
   }
   for (const auto &road_ptr : parsed_txt.roads_umap) {
-    cout << *road_ptr.second << endl;
+    cout << *(road_ptr.second) << endl;
   }
   for (const auto &subroad_ptr : parsed_txt.subroads_vector) {
     cout << *subroad_ptr << endl;
   }
 
   auto graph_ptr = buildGraph(parsed_txt);
+
+  long long int id_node_start = 25503962;
+  long long int id_node_goal = 4097873936;
+
+  Node const *const start_node_ptr = parsed_txt.nodes_umap.at(id_node_start);
+  Node const *const goal_node_ptr = parsed_txt.nodes_umap.at(id_node_goal);
+
+  cout << endl << "Running dijkstra, start:" + to_string(id_node_start) + "; goal:" + to_string(id_node_goal) << endl;
+
+  graph_ptr->dijkstra(*start_node_ptr);
+  list<Node> path_to_goal;
+  graph_ptr->getPathTo(*goal_node_ptr, path_to_goal);
+
+  auto it_node_end = path_to_goal.end();
+  for(auto it_node = path_to_goal.cbegin(); it_node != it_node_end; ++it_node) {
+    string id_to_string = to_string(it_node->getId()); 
+    if (next(it_node) == it_node_end) {
+      cout << id_to_string << endl;
+    } else {
+      cout << id_to_string + "->";
+    }
+  }
 
   return EXIT_SUCCESS;
 }
@@ -129,7 +151,7 @@ static unique_ptr<Graph<Node>> buildGraph(
       exit(EXIT_FAILURE);
     }
   }
-  cout << endl << "Created " << graph_ptr->getEdgeCount() << " edges" << endl;
+  cout << "Created " << graph_ptr->getEdgeCount() << " edges" << endl;
 
   return graph_ptr;
 }
