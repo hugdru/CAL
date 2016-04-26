@@ -4,6 +4,7 @@
 #include <vector>
 #include <queue>
 #include <set>
+#include <list>
 
 using namespace std;
 
@@ -21,7 +22,7 @@ class Vertex {
   bool visited;
   bool processing;
   double cost;
-  Vertex* vertex_least_cost;
+  Vertex<T>* vertex_least_cost;
 
  public:
   friend class Graph<T>;
@@ -150,12 +151,12 @@ struct VertexSetGreaterThan {
 /* GRAPH */
 template <typename T>
 class Graph {
+  public:
+  using VertexSet_t = set<Vertex<T>*, VertexSetGreaterThan<T>>;
  private:
-  set<Vertex<T>*, VertexSetGreaterThan<T>> vertexSet;
+  VertexSet_t vertexSet;
   long unsigned int edge_count = 0;
   int numCycles;
-  int** W;
-  int** P;
 
   void dfs(Vertex<T>* v, vector<T>& path_history) const;
 
@@ -163,16 +164,17 @@ class Graph {
   vector<T> dfs() const;
   vector<T> bfs(Vertex<T>* v) const;
   void dijkstra(const T& in);
+  void getPathTo(const T& in, list<T>& res) const;
 
   bool addVertex(const T& in);
   bool addEdge(const T& in_origin, const T& in_target, double weight);
   bool removeVertex(const T& in);
   bool removeEdge(const T& in_origin, const T& in_target);
 
-  vector<Vertex<T>*> getVertexSet() const;
+  typename Graph<T>::VertexSet_t getVertexSet() const;
   long unsigned int getVertexCount() const;
   long unsigned int getEdgeCount() const;
-  Vertex<T>* getVertex(const T& in) const;
+Vertex<T>* getVertex(const T& in, typename Graph<T>::VertexSet_t::iterator *it_ptr = nullptr, bool erase = false);
   vector<Vertex<T>*> getSources() const;
 };
 
@@ -185,7 +187,7 @@ long unsigned int Graph<T>::getEdgeCount() const {
   return this->edge_count;
 }
 template <typename T>
-vector<Vertex<T>*> Graph<T>::getVertexSet() const {
+typename Graph<T>::VertexSet_t Graph<T>::getVertexSet() const {
   return vertexSet;
 }
 
@@ -202,18 +204,14 @@ bool Graph<T>::addVertex(const T& in) {
 
 template <typename T>
 bool Graph<T>::removeVertex(const T& in) {
-  auto vertex_in_search = make_shared<Vertex<T>>(in);
 
-  auto it_vertex_info = this->vertexSet.find(vertex_in_search.get());
-  if (it_vertex_info == this->vertexSet.end()) {
+  Vertex<T>* vertex_info = this->getVertex(in, nullptr, true);
+  if (vertex_info == nullptr) {
     return false;
   }
 
-  Vertex<T>* vertex_info = *it_vertex_info;
-  vertexSet.erase(it_vertex_info);
-
   for (const auto& it_vertex : this->vertexSet) {
-    (*it_vertex_info)->removeEdgeTo(vertex_info);
+    (*it_vertex)->removeEdgeTo(vertex_info);
   }
 
   delete vertex_info;
@@ -222,21 +220,12 @@ bool Graph<T>::removeVertex(const T& in) {
 
 template <typename T>
 bool Graph<T>::addEdge(const T& in_origin, const T& in_target, double weight) {
-  auto vertex_origin_search = make_shared<Vertex<T>>(in_origin);
-  auto vertex_target_search = make_shared<Vertex<T>>(in_target);
 
-  typename set<Vertex<T>*>::iterator it_vertex_origin =
-      this->vertexSet.find(vertex_origin_search.get());
-  typename set<Vertex<T>*>::iterator it_vertex_target =
-      this->vertexSet.find(vertex_target_search.get());
-
-  auto it_vertex_end = this->vertexSet.end();
-  if (it_vertex_origin == it_vertex_end || it_vertex_target == it_vertex_end) {
+  Vertex<T>* vertex_origin = this->getVertex(in_origin);
+  Vertex<T>* vertex_target = this->getVertex(in_target);
+  if (vertex_origin == nullptr || vertex_target == nullptr) {
     return false;
   }
-
-  Vertex<T>* vertex_origin = *it_vertex_origin;
-  Vertex<T>* vertex_target = *it_vertex_target;
 
   vertex_origin->addEdge(vertex_target, weight);
 
@@ -246,19 +235,12 @@ bool Graph<T>::addEdge(const T& in_origin, const T& in_target, double weight) {
 
 template <typename T>
 bool Graph<T>::removeEdge(const T& in_origin, const T& in_target) {
-  auto vertex_origin_search = make_shared<Vertex<T>>(in_origin);
-  auto vertex_target_search = make_shared<Vertex<T>>(in_target);
 
-  auto it_vertex_origin = this->vertexSet.find(vertex_origin_search.get());
-  auto it_vertex_target = this->vertexSet.find(vertex_target_search.get());
-
-  auto it_vertex_end = this->vertexSet.end();
-  if (it_vertex_origin == it_vertex_end || it_vertex_target == it_vertex_end) {
+  Vertex<T>* vertex_origin = this->getVertex(in_origin);
+  Vertex<T>* vertex_target = this->getVertex(in_target);
+  if (vertex_origin == nullptr || vertex_target == nullptr) {
     return false;
   }
-
-  Vertex<T>* vertex_origin = *it_vertex_origin;
-  Vertex<T>* vertex_target = *it_vertex_target;
 
   if (!vertex_origin->removeEdgeTo(vertex_target)) {
     return false;
@@ -320,12 +302,29 @@ vector<T> Graph<T>::bfs(Vertex<T>* vertex) const {
 }
 
 template <typename T>
-Vertex<T>* Graph<T>::getVertex(const T& in) const {
-  auto it_vertex = this->vertexSet.find(&in);
-  if (it_vertex == this - vertexSet.end()) {
+Vertex<T>* Graph<T>::getVertex(const T& in, typename Graph<T>::VertexSet_t::iterator *it_ptr, bool erase) {
+  auto vertex_in_search = make_shared<Vertex<T>>(in);
+
+  auto it_vertex_info = this->vertexSet.find(vertex_in_search.get());
+  if (it_vertex_info == this->vertexSet.end()) {
+    if (it_ptr != nullptr) {
+      *it_ptr = this->vertexSet.end();
+    }
     return NULL;
   }
-  return *it_vertex;
+
+  if (it_ptr != nullptr) {
+    *it_ptr = it_vertex_info;
+  }
+
+  Vertex<T> *vertex_ptr = *it_vertex_info;
+  if (erase) {
+    if (it_ptr != nullptr) {
+      *it_ptr = this->vertexSet.end();
+    }
+    this->vertexSet.erase(it_vertex_info);
+  }
+  return vertex_ptr;
 }
 
 template <typename T>
@@ -367,6 +366,21 @@ void Graph<T>::dijkstra(const T& in) {
                   VertexCostGreaterThan<T>());
       }
     }
+  }
+}
+
+template <typename T>
+void Graph<T>::getPathTo(const T& in, list<T>& path) const {
+  path.clear();
+
+  Vertex<T> *goal_vertex = this->getVertex(in);
+  if (goal_vertex == nullptr) {
+    return;
+  }
+
+  while (goal_vertex != nullptr) {
+    path.push_front(goal_vertex->info);
+    goal_vertex = goal_vertex->vertex_least_cost;
   }
 }
 
