@@ -10,3 +10,7 @@ Release
 **/*.map
 **/run/**
 !**/run/*.sh
+!**/run/*.png
+!**/run/*.jpg
+!**/run/*.jpeg
+!**/run/*.gif
