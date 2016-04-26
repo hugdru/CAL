@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
        << "Go to: http://overpass-turbo.eu/ ; paste the following ; type run ; "
           "click the magnifying class (zoom to data)"
        << endl;
-  cout << map_result;
+  cout << map_result << endl;
 
   save_overpass_map_query(
       map_result, parsed_options.at(
@@ -195,7 +195,8 @@ static void save_overpass_map_query(string &map_shortest_result,
   char const *const file_path_out_cstring = file_path_out.c_str();
 
   if (boost::filesystem::exists(file_path_out_cstring)) {
-    cout << endl << file_path_out << " already exists, type Yy to overwrite." << endl;
+    cout << endl
+         << file_path_out << " already exists, type Yy to overwrite." << endl;
     char input[3] = {0};
     cin.get(input, 3);
     if (strncmp(input, "Yy", 2) != 0) {
