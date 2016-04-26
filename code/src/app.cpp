@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 #include "WebFetch.hpp"
 #include "CommandLineParser.hpp"
@@ -12,6 +13,11 @@ static unique_ptr<TxtMapParser> CommandLineParserAnalyzer(
 
 static unique_ptr<Graph<Node>> buildGraph(
     TxtMapParser::txt_parsed_t &parsed_txt);
+
+static string generate_overpass_map_query(list<Subroad *> &subroads_list);
+
+static void save_overpass_map_query(string &map_shortest_result,
+                                    string &file_path_out);
 
 int main(int argc, char *argv[]) {
   using std::cout;
@@ -46,27 +52,41 @@ int main(int argc, char *argv[]) {
 
   auto graph_ptr = buildGraph(parsed_txt);
 
-  long long int id_node_start = 25503962;
-  long long int id_node_goal = 4097873936;
+  long long int id_node_start = stoll(parsed_options.at(
+      CommandLineParser::Options::MAP_START_NODE));  // 25503962;
+  long long int id_node_goal = stoll(parsed_options.at(
+      CommandLineParser::Options::MAP_GOAL_NODE));  // 4097873936;
 
-  Node const *const start_node_ptr = parsed_txt.nodes_umap.at(id_node_start);
-  Node const *const goal_node_ptr = parsed_txt.nodes_umap.at(id_node_goal);
+  Node const *start_node_ptr;
+  Node const *goal_node_ptr;
+  try {
+    start_node_ptr = parsed_txt.nodes_umap.at(id_node_start);
+    goal_node_ptr = parsed_txt.nodes_umap.at(id_node_goal);
+  } catch (const out_of_range &e) {
+    cerr << "Either start_node or goal_node don't exist, " << e.what() << endl;
+    exit(EXIT_FAILURE);
+  }
 
-  cout << endl << "Running dijkstra, start:" + to_string(id_node_start) + "; goal:" + to_string(id_node_goal) << endl;
+  cout << endl
+       << "Running dijkstra, start:" + to_string(id_node_start) + "; goal:" +
+              to_string(id_node_goal)
+       << endl;
 
   graph_ptr->dijkstra(*start_node_ptr);
-  list<Node> path_to_goal;
-  graph_ptr->getPathTo(*goal_node_ptr, path_to_goal);
+  list<Node> nodes_to_goal;
 
-  auto it_node_end = path_to_goal.end();
-  for(auto it_node = path_to_goal.cbegin(); it_node != it_node_end; ++it_node) {
-    string id_to_string = to_string(it_node->getId()); 
-    if (next(it_node) == it_node_end) {
-      cout << id_to_string << endl;
-    } else {
-      cout << id_to_string + "->";
-    }
-  }
+  list<Subroad *> subroads_to_goal;
+  graph_ptr->getSubroadsPathTo(*goal_node_ptr, subroads_to_goal);
+  string map_result = generate_overpass_map_query(subroads_to_goal);
+  cout << endl
+       << "Go to: http://overpass-turbo.eu/ ; paste the following ; type run ; "
+          "click the magnifying class (zoom to data)"
+       << endl;
+  cout << map_result;
+
+  save_overpass_map_query(
+      map_result, parsed_options.at(
+                      CommandLineParser::Options::MAP_SHORTEST_OVERPASS_FILE));
 
   return EXIT_SUCCESS;
 }
@@ -141,9 +161,9 @@ static unique_ptr<Graph<Node>> buildGraph(
       Node const *const node_dest =
           parsed_txt.nodes_umap.at(road_nodes_id.destination);
       auto distance = node_src->distance(*node_dest);
-      graph_ptr->addEdge(*node_src, *node_dest, distance);
+      graph_ptr->addEdge(*node_src, *node_dest, distance, subroad);
       if (road->isTwoWay()) {
-        graph_ptr->addEdge(*node_dest, *node_src, distance);
+        graph_ptr->addEdge(*node_dest, *node_src, distance, subroad);
       }
     } catch (const logic_error &e) {
       cerr << e.what() << " " << road_nodes_id.source << " or "
@@ -154,4 +174,41 @@ static unique_ptr<Graph<Node>> buildGraph(
   cout << "Created " << graph_ptr->getEdgeCount() << " edges" << endl;
 
   return graph_ptr;
+}
+
+static string generate_overpass_map_query(list<Subroad *> &subroads_list) {
+  static stringstream url;
+  url << "(";
+  for (auto &subroad_ptr : subroads_list) {
+    Subroad::segment_t node_ids;
+    subroad_ptr->getNodesId(node_ids);
+    url << "node(" << node_ids.source << ");"
+        << "node(" << node_ids.destination << ");"
+        << "way(" << subroad_ptr->getRoadId() << ");";
+  }
+  url << ");out;";
+  return url.str();
+}
+
+static void save_overpass_map_query(string &map_shortest_result,
+                                    string &file_path_out) {
+  char const *const file_path_out_cstring = file_path_out.c_str();
+
+  if (boost::filesystem::exists(file_path_out_cstring)) {
+    cout << endl << file_path_out << " already exists, type Yy to overwrite." << endl;
+    char input[3] = {0};
+    cin.get(input, 3);
+    if (strncmp(input, "Yy", 2) != 0) {
+      return;
+    }
+  }
+
+  std::ofstream file;
+  file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+
+  file.open(file_path_out_cstring, ios_base::out | ios_base::trunc);
+  if (file.is_open()) {
+    file << map_shortest_result;
+    file.close();
+  }
 }

@@ -26,7 +26,8 @@ class CommandLineParser {
   char **arguments;
   string help =
       "( (--queryfile|-qf) queryfile [outputfile] ) | ( (--maptxtfiles|-mtf) "
-      "nodesfile roadsfile waysfile "
+      "in_nodesfile in_roadsfile in_waysfile in_start_node in_goal_node "
+      "out_shortest_file"
       ")";
 
   void error(string error);
@@ -38,7 +39,10 @@ class CommandLineParser {
     QUERY_FILE_OUTPUT_PATH,
     MAP_NODE_FILE_PATH,
     MAP_ROAD_FILE_PATH,
-    MAP_SUBROADS_FILE_PATH
+    MAP_SUBROADS_FILE_PATH,
+    MAP_START_NODE,
+    MAP_GOAL_NODE,
+    MAP_SHORTEST_OVERPASS_FILE
   };
   CommandLineParser(const int cardinality, char **arguments);
 

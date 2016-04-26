@@ -33,9 +33,7 @@ double Node::distance(const Node &otherNode) const {
                    perimeter_longitude * perimeter_longitude);
 }
 
-long long int Node::getId() const {
-  return this->id;
-}
+long long int Node::getId() const { return this->id; }
 
 bool Node::operator<(const Node &otherNode) const {
   return this->id < otherNode.id;

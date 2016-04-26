@@ -32,15 +32,21 @@ void CommandLineParser::parse(unordered_map<Options, string> &options) {
     if (iterator == commandLineFlags.end()) {
       error(commandLineFlag + " is not a valid option.\n");
     }
+
     if (commandLineFlag == maptxtfiles_short ||
         commandLineFlag == maptxtfiles_long) {
-      if (index + 3 >= this->cardinality) {
-        error(commandLineFlag + " expects tree arguments.\n");
+      if (index + 6 >= this->cardinality) {
+        error(commandLineFlag + " expects 6 arguments.\n");
       }
       options.insert({Options::MAP_NODE_FILE_PATH, this->arguments[++index]});
       options.insert({Options::MAP_ROAD_FILE_PATH, this->arguments[++index]});
       options.insert(
           {Options::MAP_SUBROADS_FILE_PATH, this->arguments[++index]});
+      options.insert({Options::MAP_START_NODE, this->arguments[++index]});
+      options.insert({Options::MAP_GOAL_NODE, this->arguments[++index]});
+      options.insert(
+          {Options::MAP_SHORTEST_OVERPASS_FILE, this->arguments[++index]});
+
     } else if (commandLineFlag == queryfile_short ||
                commandLineFlag == queryfile_long) {
       if (index + 1 >= this->cardinality) {
