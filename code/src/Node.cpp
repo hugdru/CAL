@@ -32,6 +32,10 @@ double Node::distance(const Node &otherNode) const {
                    perimeter_longitude * perimeter_longitude);
 }
 
+bool Node::operator<(const Node &otherNode) const {
+  return this->id < otherNode.id;
+}
+
 ostream &operator<<(ostream &os, Node &node) {
   os << "NODE id: " + to_string(node.id) + "\t degrees: (" +
             to_string(node.coordinates_degrees.latitude) + ";" +

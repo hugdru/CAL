@@ -23,6 +23,7 @@ class Node {
        double lon_rad);
   bool operator==(const Node &otherNode) const;
   double distance(const Node &otherNode) const;
+  bool operator<(const Node &otherNode) const;
   friend ostream &operator<<(ostream &os, Node &node);
 };
 
