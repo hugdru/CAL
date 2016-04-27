@@ -14,3 +14,5 @@ Release
 !**/run/*.jpg
 !**/run/*.jpeg
 !**/run/*.gif
+code/doxygen
+**/*.bak
