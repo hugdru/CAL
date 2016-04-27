@@ -21,7 +21,7 @@ if [[ "$answer" = "Y" ]]; then
   sudo sh "${additions_folder}/VBoxLinuxAdditions.run"
 fi
 
-packages=("git" "git-doc" "libc6" "g++-multilib" "gcc-multilib" "libc++1" "libc++abi1" "libcurl4-gnutls-dev" "libcurlpp-dev" "libboost-all-dev" "autoconf" "libtool-bin")
+packages=("git" "git-doc" "libc6" "g++-multilib" "gcc-multilib" "libc++1" "libc++abi1" "libcurl4-gnutls-dev" "libcurlpp-dev" "libboost-all-dev" "autoconf" "libtool-bin" "doxygen" "graphviz" "doxygen-gui")
 sudo apt-get install "${packages[@]}"
 
 echo

@@ -15,13 +15,15 @@ Sistema Operativo
 Estrutura
   ./scripts/      - Scripts úteis para configurar a máquina para o desenvolvimento
   ./code/
-        src       - código fonte
-        makefile  - ficheiro de compilação, targets: debug, all->default
-        external  - ferramentas externas ao nosso projeto
-        run       - scripts de casos de uso da nossa aplicação e respetivos resultados
-        data      - mapas (nodes, roads, subroads) para -mtf e ficheiros json para -qf
-        bin       - onde são colocados os ficheiros binários
-        buildtemp - ficheiros temporários de compilação
+        src             - código fonte
+        makefile        - ficheiro de compilação, targets: debug, all->default
+        external        - ferramentas externas ao nosso projeto
+        run             - scripts de casos de uso da nossa aplicação e respetivos resultados
+        data            - mapas (nodes, roads, subroads) para -mtf e ficheiros json para -qf
+        bin             - onde são colocados os ficheiros binários
+        buildtemp       - ficheiros temporários de compilação
+        Doxyfile        - Config de geração de ficheiros de documentação
+        CAL.workspace}  - Ficheiro de projeto codelite
 
 Dependências
   Bibliotecas

@@ -25,7 +25,6 @@ class Vertex {
   T info;
   adjacency_list_t adjacency_list;
   bool visited;
-  bool processing;
   double cost;
   Edge<T>* cost_edge;
 
@@ -77,7 +76,7 @@ bool Vertex<T>::removeEdgeTo(Vertex<T> const* const otherVertex) {
 
 template <typename T>
 Vertex<T>::Vertex(T in)
-    : info{in}, visited{false}, processing{false}, cost{0}, cost_edge{NULL} {}
+    : info{in}, visited{false}, cost{0}, cost_edge{NULL} {}
 
 template <typename T>
 void Vertex<T>::addEdge(Vertex<T>* target, double weight, Subroad* subroad_) {
