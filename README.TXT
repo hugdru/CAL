@@ -23,7 +23,8 @@ Estrutura
         bin             - onde são colocados os ficheiros binários
         buildtemp       - ficheiros temporários de compilação
         Doxyfile        - Config de geração de ficheiros de documentação
-        CAL.workspace}  - Ficheiro de projeto codelite
+        Doxygen         - Pasta com a geração da documentação doxygen
+        CAL.workspace   - Ficheiro de projeto codelite
 
 Dependências
   Bibliotecas
