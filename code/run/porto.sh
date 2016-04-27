@@ -1,5 +1,6 @@
 #/usr/bin/env bash
 
+cd "$(dirname "$0")"
 make -C ../
 
 porto_nodes="../data/porto/nodes.txt"

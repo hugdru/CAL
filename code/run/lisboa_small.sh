@@ -1,5 +1,6 @@
 #/usr/bin/env bash
 
+cd "$(dirname "$0")"
 make -C ../
 
 lisboa_small_nodes="../data/lisboa_small/nodes.txt"
