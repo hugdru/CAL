@@ -27,18 +27,21 @@ int main(int argc, char *argv[]) {
   unordered_map<CommandLineParser::Options, string> parsed_options{};
 
   try {
+    cout << "Parsing commandLine options" << endl;
     commandLineParser.parse(parsed_options);
   } catch (const exception &e) {
     cerr << e.what() << endl;
     return EXIT_FAILURE;
   }
 
+  cout << "Analyzing commandLine options" << endl;
   unique_ptr<TxtMapParser> txtFileParser =
       CommandLineParserAnalyzer(parsed_options);
   if (txtFileParser == nullptr) {
     return EXIT_SUCCESS;
   }
 
+  cout << "Parsing nodes, roads and subroads files" << endl;
   TxtMapParser::txt_parsed_t parsed_txt = txtFileParser->parse();
   for (const auto &node_ptr : parsed_txt.nodes_umap) {
     cout << *(node_ptr.second) << endl;
@@ -50,22 +53,33 @@ int main(int argc, char *argv[]) {
     cout << *subroad_ptr << endl;
   }
 
+  cout << "Building graph" << endl;
   auto graph_ptr = buildGraph(parsed_txt);
 
   long long int id_node_start = stoll(parsed_options.at(
-      CommandLineParser::Options::MAP_START_NODE));  // 25503962;
+      CommandLineParser::Options::MAP_START_NODE));
   long long int id_node_goal = stoll(parsed_options.at(
-      CommandLineParser::Options::MAP_GOAL_NODE));  // 4097873936;
+      CommandLineParser::Options::MAP_GOAL_NODE));
 
-  Node const *start_node_ptr;
-  Node const *goal_node_ptr;
-  try {
-    start_node_ptr = parsed_txt.nodes_umap.at(id_node_start);
-    goal_node_ptr = parsed_txt.nodes_umap.at(id_node_goal);
-  } catch (const out_of_range &e) {
-    cerr << "Either start_node or goal_node don't exist, " << e.what() << endl;
+  bool valid_start_goal = true;
+  auto it_end_nodes_umap = parsed_txt.nodes_umap.end();
+  auto it_start_node = parsed_txt.nodes_umap.find(id_node_start);
+  if (it_start_node == it_end_nodes_umap) {
+    valid_start_goal = false;
+    cerr << "invalid start_node_id: " << id_node_start << endl;
+  }
+  auto it_goal_node = parsed_txt.nodes_umap.find(id_node_goal);
+  if (it_goal_node == it_end_nodes_umap) {
+    valid_start_goal = false;
+    cerr << "invalid goal_node_id: " << id_node_goal << endl;
+  }
+
+  if (!valid_start_goal) {
     exit(EXIT_FAILURE);
   }
+
+  Node const *start_node_ptr = it_start_node->second;
+  Node const *goal_node_ptr = it_goal_node->second;
 
   cout << endl
        << "Running dijkstra, start:" + to_string(id_node_start) + "; goal:" +
