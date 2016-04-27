@@ -11,6 +11,7 @@ echo 'In the Virtual Box menu go to Devices->Insert Guest Additions CD Image...'
 echo 'Type Y when done'
 echo "*********************************************"
 read answer
+echo
 if [[ "$answer" = "Y" ]]; then
   sudo apt-get install build-essential module-assistant
   sudo m-a prepare
@@ -22,6 +23,7 @@ fi
 packages=("git" "git-doc" "libc6" "g++-multilib" "gcc-multilib" "libc++1" "libc++abi1" "libcurl4-gnutls-dev" "libcurlpp-dev" "libboost-all-dev" "autoconf" "libtool-bin")
 sudo apt-get install "${packages[@]}"
 
+echo
 echo "Downloading Curlpp"
 pkgver="0.7.3"
 curlpp_url="https://github.com/jpbarrette/curlpp/archive/v${pkgver}.tar.gz"
@@ -34,6 +36,7 @@ wget "$curlpp_url" -O "$output_file"
 tar xfz "$output_file"
 cd curlpp-*
 
+echo
 echo "Compiling Curlpp"
 ./autogen.sh
 ./configure --prefix=/usr/local
@@ -41,6 +44,7 @@ sudo make CXXFLAGS='-O2' install
 cd ~
 sudo rm -rf "$tmp_dir"
 
+echo
 echo 'Do you want to install codelite?'
 echo 'Type Y for yes'
 read install_codelite

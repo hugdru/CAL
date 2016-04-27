@@ -26,7 +26,7 @@ class CommandLineParser {
   char **arguments;
   string help =
       "( (--queryfile|-qf) queryfile [outputfile] ) | ( (--maptxtfiles|-mtf) "
-      "in_nodesfile in_roadsfile in_waysfile in_start_node in_goal_node "
+      "in_nodesfile in_roadsfile in_waysfile in_start_node_id in_goal_node_id "
       "out_shortest_file"
       ")";
 
