@@ -4,6 +4,7 @@ set -e
 
 sudo apt-get update
 sudo apt-get upgrade
+echo
 
 echo "*********************************************"
 echo 'If you want to configure Virtual Box do the following:'
