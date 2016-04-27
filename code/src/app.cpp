@@ -1,5 +1,7 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include <chrono>
+#include <ctime>
 
 #include "WebFetch.hpp"
 #include "CommandLineParser.hpp"
@@ -56,10 +58,10 @@ int main(int argc, char *argv[]) {
   cout << "Building graph" << endl;
   auto graph_ptr = buildGraph(parsed_txt);
 
-  long long int id_node_start = stoll(parsed_options.at(
-      CommandLineParser::Options::MAP_START_NODE));
-  long long int id_node_goal = stoll(parsed_options.at(
-      CommandLineParser::Options::MAP_GOAL_NODE));
+  long long int id_node_start =
+      stoll(parsed_options.at(CommandLineParser::Options::MAP_START_NODE));
+  long long int id_node_goal =
+      stoll(parsed_options.at(CommandLineParser::Options::MAP_GOAL_NODE));
 
   bool valid_start_goal = true;
   auto it_end_nodes_umap = parsed_txt.nodes_umap.end();
@@ -86,7 +88,19 @@ int main(int argc, char *argv[]) {
               to_string(id_node_goal)
        << endl;
 
+  clock_t clock_start = std::clock();
+  auto time_start = std::chrono::high_resolution_clock::now();
   graph_ptr->dijkstra(*start_node_ptr);
+  clock_t clock_end = std::clock();
+  auto time_end = std::chrono::high_resolution_clock::now();
+  std::cout << std::fixed << std::setprecision(2) << "CPU time used: "
+            << 1000.0 * (clock_end - clock_start) / CLOCKS_PER_SEC << " ms"
+            << endl
+            << "Wall clock time passed: "
+            << std::chrono::duration<double, std::milli>(time_end - time_start)
+                   .count()
+            << " ms" << endl;
+
   list<Node> nodes_to_goal;
 
   list<Subroad *> subroads_to_goal;
