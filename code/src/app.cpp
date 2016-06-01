@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
   }
 
   Node const *start_node_ptr = it_start_node->second;
-  Node const *goal_node_ptr = it_goal_node->second;
+  Node *goal_node_ptr = it_goal_node->second;
 
   cout << endl
        << "Running dijkstra, start:" + to_string(id_node_start) + "; goal:" +
@@ -124,12 +124,13 @@ int main(int argc, char *argv[]) {
     cout << *(road_ptr.second) << endl;
   }
 
-  // KNUTH MORRIS PRATT
-  cout << endl << "Knuth Morris Pratt - Choose a destination" << endl;
+  cout << endl << "Choose a destination" << endl;
   string destination;
   cin.ignore();
   getline(std::cin, destination);
 
+  // KNUTH MORRIS PRATT
+  cout << endl << "Knuth Morris Pratt" << endl;
   unique_ptr<vector<int>> piTable =
       StringAlgorithms::knuthMorrisPrattBuildPiTable(destination);
   if (piTable == nullptr) {
@@ -163,18 +164,23 @@ int main(int argc, char *argv[]) {
     cerr << "Choose a valid option";
     return EXIT_FAILURE;
   }
-
-  // *goal_node_ptr = it_goal_node->second;
-  // list<Subroad *> subroads_to_goal;
-  // graph_ptr->getSubroadsPathTo(*goal_node_ptr, subroads_to_goal);
-  // string map_result = generate_overpass_map_query(subroads_to_goal);
-  // cout << endl
-  //      << "Go to: http://overpass-turbo.eu/ ; paste the following ; type run
-  //      ; "
-  //         "click the magnifying class (zoom to data)"
-  //      << endl;
-  // cout << map_result << endl;
-  // END OF KNUTH MORRIS PRATT
+  Road *road = parsed_txt.roads_umap.at(matchedRoads.at(choice)->getId());
+  vector<Subroad*> subroads = road->getSubroads();
+  if (subroads.size() == 0) {
+    cerr << "This road doesn't have any subroads";
+    return EXIT_FAILURE;
+  }
+  Subroad::segment_t NodesIds;
+  subroads.at(0)->getNodesId(NodesIds);
+  goal_node_ptr = parsed_txt.nodes_umap.at(NodesIds.destination);
+  graph_ptr->getSubroadsPathTo(*goal_node_ptr, subroads_to_goal);
+  map_result = generate_overpass_map_query(subroads_to_goal);
+  cout << endl
+       << "Go to: http://overpass-turbo.eu/ ; paste the following ; type run ; "
+          "click the magnifying class (zoom to data)"
+       << endl;
+  cout << map_result << endl;
+  //END OF KNUTH MORRIS PRATT
 
   return EXIT_SUCCESS;
 }
