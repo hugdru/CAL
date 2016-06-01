@@ -19,6 +19,7 @@ class Road {
   bool operator==(const Road &otherRoad) const;
   friend ostream &operator<<(ostream &os, Road &road);
   long long int getId() const;
+  string getName() const;
   bool isTwoWay() const;
 };
 

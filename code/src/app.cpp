@@ -1,14 +1,16 @@
-#include <iostream>
 #include <boost/filesystem.hpp>
 #include <chrono>
 #include <ctime>
+#include <forward_list>
+#include <iostream>
 
-#include "WebFetch.hpp"
 #include "CommandLineParser.hpp"
-#include "app.hpp"
-#include "QueryFileParser.hpp"
-#include "TxtMapParser.hpp"
 #include "Graph.hpp"
+#include "QueryFileParser.hpp"
+#include "StringAlgorithms.hpp"
+#include "TxtMapParser.hpp"
+#include "WebFetch.hpp"
+#include "app.hpp"
 
 static unique_ptr<TxtMapParser> CommandLineParserAnalyzer(
     unordered_map<CommandLineParser::Options, string> &parsed_options);
@@ -24,6 +26,7 @@ static void save_overpass_map_query(string &map_shortest_result,
 int main(int argc, char *argv[]) {
   using std::cout;
   using std::endl;
+  using std::forward_list;
 
   CommandLineParser commandLineParser{argc, argv};
   unordered_map<CommandLineParser::Options, string> parsed_options{};
@@ -45,15 +48,15 @@ int main(int argc, char *argv[]) {
 
   cout << "Parsing nodes, roads and subroads files" << endl;
   TxtMapParser::txt_parsed_t parsed_txt = txtFileParser->parse();
-  for (const auto &node_ptr : parsed_txt.nodes_umap) {
-    cout << *(node_ptr.second) << endl;
-  }
-  for (const auto &road_ptr : parsed_txt.roads_umap) {
-    cout << *(road_ptr.second) << endl;
-  }
-  for (const auto &subroad_ptr : parsed_txt.subroads_vector) {
-    cout << *subroad_ptr << endl;
-  }
+  // for (const auto &node_ptr : parsed_txt.nodes_umap) {
+  //   cout << *(node_ptr.second) << endl;
+  // }
+  // for (const auto &road_ptr : parsed_txt.roads_umap) {
+  //   cout << *(road_ptr.second) << endl;
+  // }
+  // for (const auto &subroad_ptr : parsed_txt.subroads_vector) {
+  //   cout << *subroad_ptr << endl;
+  // }
 
   cout << "Building graph" << endl;
   auto graph_ptr = buildGraph(parsed_txt);
@@ -103,8 +106,9 @@ int main(int argc, char *argv[]) {
 
   list<Node> nodes_to_goal;
 
-  list<Subroad *> subroads_to_goal;
+  list<Subroad *> subroads_to_goal{};
   graph_ptr->getSubroadsPathTo(*goal_node_ptr, subroads_to_goal);
+
   string map_result = generate_overpass_map_query(subroads_to_goal);
   cout << endl
        << "Go to: http://overpass-turbo.eu/ ; paste the following ; type run ; "
@@ -115,6 +119,62 @@ int main(int argc, char *argv[]) {
   save_overpass_map_query(
       map_result, parsed_options.at(
                       CommandLineParser::Options::MAP_SHORTEST_OVERPASS_FILE));
+
+  for (const auto &road_ptr : parsed_txt.roads_umap) {
+    cout << *(road_ptr.second) << endl;
+  }
+
+  // KNUTH MORRIS PRATT
+  cout << endl << "Knuth Morris Pratt - Choose a destination" << endl;
+  string destination;
+  cin.ignore();
+  getline(std::cin, destination);
+
+  unique_ptr<vector<int>> piTable =
+      StringAlgorithms::knuthMorrisPrattBuildPiTable(destination);
+  if (piTable == nullptr) {
+    cerr << "Failed to build pitable";
+    return EXIT_FAILURE;
+  }
+
+  unordered_map<unsigned long, Road *> matchedRoads{};
+  unsigned long index = 0;
+  for (const auto &road_ptr : parsed_txt.roads_umap) {
+    Road &road = *(road_ptr.second);
+    if (StringAlgorithms::knuthMorrisPratt(destination, road.getName(),
+                                           piTable) != -1) {
+      cout << index << ": " << road.getName() << endl;
+      matchedRoads.insert({index, &road});
+      ++index;
+    }
+  }
+
+  if (index == 0) {
+    cerr << destination << " not found";
+    return EXIT_FAILURE;
+  }
+
+  cout << "Choose" << endl;
+  string choiceStr;
+  cin >> choiceStr;
+
+  unsigned long choice = stoul(choiceStr, nullptr, 10);
+  if (choice >= index) {
+    cerr << "Choose a valid option";
+    return EXIT_FAILURE;
+  }
+
+  // *goal_node_ptr = it_goal_node->second;
+  // list<Subroad *> subroads_to_goal;
+  // graph_ptr->getSubroadsPathTo(*goal_node_ptr, subroads_to_goal);
+  // string map_result = generate_overpass_map_query(subroads_to_goal);
+  // cout << endl
+  //      << "Go to: http://overpass-turbo.eu/ ; paste the following ; type run
+  //      ; "
+  //         "click the magnifying class (zoom to data)"
+  //      << endl;
+  // cout << map_result << endl;
+  // END OF KNUTH MORRIS PRATT
 
   return EXIT_SUCCESS;
 }

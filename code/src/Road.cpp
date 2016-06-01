@@ -16,6 +16,8 @@ bool Road::operator==(const Road &otherRoad) const {
 
 long long int Road::getId() const { return this->id; }
 
+string Road::getName() const { return *this->name; }
+
 bool Road::isTwoWay() const { return this->is_two_way; }
 
 ostream &operator<<(ostream &os, Road &road) {
