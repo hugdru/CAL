@@ -25,3 +25,15 @@ ostream &operator<<(ostream &os, Road &road) {
             "\t two_way: " + ((road.is_two_way) ? "True" : "False");
   return os;
 }
+
+bool Road::addSubroad(Subroad *subroad) {
+  if (subroad == nullptr) {
+    return false;
+  }
+  this->subroads.push_back(subroad);
+  return true;
+}
+
+vector<Subroad *> Road::getSubroads() {
+  return this->subroads;
+}

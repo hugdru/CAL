@@ -119,8 +119,8 @@ void TxtMapParser::parse_subroads(void) {
       long long int id_node1 = stoll(subroad_arguments[1]);
       long long int id_node2 = stoll(subroad_arguments[2]);
 
-      this->parsed.subroads_vector.push_back(
-          new Subroad{id_road, id_node1, id_node2});
+      Road *road = this->parsed.roads_umap.at(id_road);
+      road->addSubroad(new Subroad{id_road, id_node1, id_node2});
     }
   } else {
     throw std::invalid_argument("Subroads file invalid, failed to open file");
@@ -132,9 +132,10 @@ TxtMapParser::~TxtMapParser() {
     delete node_ptr.second;
   }
   for (const auto &road_ptr : this->parsed.roads_umap) {
+    vector<Subroad *> subroads = road_ptr.second->getSubroads();
+    for (const auto &subroad_ptr : subroads) {
+      delete subroad_ptr;
+    }
     delete road_ptr.second;
-  }
-  for (const auto &subroad_ptr : this->parsed.subroads_vector) {
-    delete subroad_ptr;
   }
 }

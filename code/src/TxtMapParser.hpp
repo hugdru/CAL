@@ -23,7 +23,6 @@ class TxtMapParser {
   using txt_parsed_t = struct {
     unordered_map<long long int, Node *> nodes_umap;
     unordered_map<long long int, Road *> roads_umap;
-    vector<Subroad *> subroads_vector;
   };
 
  private:

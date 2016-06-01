@@ -237,26 +237,29 @@ static unique_ptr<Graph<Node>> buildGraph(
   cout << endl
        << "Created " << graph_ptr->getVertexCount() << " vertices" << endl;
 
-  for (const auto &subroad : parsed_txt.subroads_vector) {
-    auto road_id = subroad->getRoadId();
-    Subroad::segment_t road_nodes_id;
-    subroad->getNodesId(road_nodes_id);
+  for (const auto &road_ptr : parsed_txt.roads_umap) {
+    vector<Subroad *> subroads = road_ptr.second->getSubroads();
+    for (const auto &subroad : subroads) {
+      auto road_id = subroad->getRoadId();
+      Subroad::segment_t road_nodes_id;
+      subroad->getNodesId(road_nodes_id);
 
-    Road const *const road = parsed_txt.roads_umap.at(road_id);
-    try {
-      Node const *const node_src =
-          parsed_txt.nodes_umap.at(road_nodes_id.source);
-      Node const *const node_dest =
-          parsed_txt.nodes_umap.at(road_nodes_id.destination);
-      auto distance = node_src->distance(*node_dest);
-      graph_ptr->addEdge(*node_src, *node_dest, distance, subroad);
-      if (road->isTwoWay()) {
-        graph_ptr->addEdge(*node_dest, *node_src, distance, subroad);
+      Road const *const road = parsed_txt.roads_umap.at(road_id);
+      try {
+        Node const *const node_src =
+            parsed_txt.nodes_umap.at(road_nodes_id.source);
+        Node const *const node_dest =
+            parsed_txt.nodes_umap.at(road_nodes_id.destination);
+        auto distance = node_src->distance(*node_dest);
+        graph_ptr->addEdge(*node_src, *node_dest, distance, subroad);
+        if (road->isTwoWay()) {
+          graph_ptr->addEdge(*node_dest, *node_src, distance, subroad);
+        }
+      } catch (const logic_error &e) {
+        cerr << e.what() << " " << road_nodes_id.source << " or "
+            << road_nodes_id.destination << " missing.";
+        exit(EXIT_FAILURE);
       }
-    } catch (const logic_error &e) {
-      cerr << e.what() << " " << road_nodes_id.source << " or "
-           << road_nodes_id.destination << " missing.";
-      exit(EXIT_FAILURE);
     }
   }
   cout << "Created " << graph_ptr->getEdgeCount() << " edges" << endl;
