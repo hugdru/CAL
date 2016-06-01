@@ -3,6 +3,7 @@
 #include <ctime>
 #include <forward_list>
 #include <iostream>
+#include <set>
 
 #include "CommandLineParser.hpp"
 #include "Graph.hpp"
@@ -23,10 +24,24 @@ static string generate_overpass_map_query(list<Subroad *> &subroads_list);
 static void save_overpass_map_query(string &map_shortest_result,
                                     string &file_path_out);
 
+struct RoadEditDistance {
+  Road *road;
+  int distance;
+
+  RoadEditDistance(Road *road_, int distance_) {
+    this->road = road_;
+    this->distance = distance_;
+  }
+  friend bool operator< (const RoadEditDistance &left, const RoadEditDistance &right) {
+    return left.distance > right.distance;
+  }
+};
+
 int main(int argc, char *argv[]) {
   using std::cout;
   using std::endl;
   using std::forward_list;
+  using std::set;
 
   CommandLineParser commandLineParser{argc, argv};
   unordered_map<CommandLineParser::Options, string> parsed_options{};
@@ -165,7 +180,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
   Road *road = parsed_txt.roads_umap.at(matchedRoads.at(choice)->getId());
-  vector<Subroad*> subroads = road->getSubroads();
+  vector<Subroad *> subroads = road->getSubroads();
   if (subroads.size() == 0) {
     cerr << "This road doesn't have any subroads";
     return EXIT_FAILURE;
@@ -180,7 +195,55 @@ int main(int argc, char *argv[]) {
           "click the magnifying class (zoom to data)"
        << endl;
   cout << map_result << endl;
-  //END OF KNUTH MORRIS PRATT
+  // END OF KNUTH MORRIS PRATT
+  // LENVENSHTEIN DISTANCE
+  cout << endl << "Lenvenshtein Distance" << endl;
+
+  multiset<RoadEditDistance> roadsEditDistance {};
+  for (const auto &road_ptr : parsed_txt.roads_umap) {
+    Road &roadCurrent = *(road_ptr.second);
+    int editDistance = StringAlgorithms::dynamicProgrammingLevenshteinDistance(destination, roadCurrent.getName());
+    if (editDistance == -1) {
+      cerr << "Invalid edit distance";
+      return EXIT_FAILURE;
+    }
+    RoadEditDistance roadEditDistance (&roadCurrent, editDistance);
+    roadsEditDistance.insert(roadEditDistance);
+  }
+  cout << index << endl;
+
+  unordered_map<unsigned long, RoadEditDistance> roadsSelector{};
+  index = 0;
+  for (const auto &roadEditDistance : roadsEditDistance) {
+      cout << index << ": " << roadEditDistance.distance << "-" << roadEditDistance.road->getName() << endl;
+      ++index;
+      roadsSelector.insert({index, roadEditDistance});
+  }
+
+  cout << "Choose" << endl;
+  cin >> choiceStr;
+
+  choice = stoul(choiceStr, nullptr, 10);
+  if (choice >= index) {
+    cerr << "Choose a valid option";
+    return EXIT_FAILURE;
+  }
+  road = parsed_txt.roads_umap.at(roadsSelector.at(choice).road->getId());
+  subroads = road->getSubroads();
+  if (subroads.size() == 0) {
+    cerr << "This road doesn't have any subroads";
+    return EXIT_FAILURE;
+  }
+  subroads.at(0)->getNodesId(NodesIds);
+  goal_node_ptr = parsed_txt.nodes_umap.at(NodesIds.destination);
+  graph_ptr->getSubroadsPathTo(*goal_node_ptr, subroads_to_goal);
+  map_result = generate_overpass_map_query(subroads_to_goal);
+  cout << endl
+       << "Go to: http://overpass-turbo.eu/ ; paste the following ; type run ; "
+          "click the magnifying class (zoom to data)"
+       << endl;
+  cout << map_result << endl;
+  // END OF LENVENSHTEIN DISTANCE
 
   return EXIT_SUCCESS;
 }
@@ -263,7 +326,7 @@ static unique_ptr<Graph<Node>> buildGraph(
         }
       } catch (const logic_error &e) {
         cerr << e.what() << " " << road_nodes_id.source << " or "
-            << road_nodes_id.destination << " missing.";
+             << road_nodes_id.destination << " missing.";
         exit(EXIT_FAILURE);
       }
     }
