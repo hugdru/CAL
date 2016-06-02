@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
 
   // KNUTH MORRIS PRATT
   cout << endl << "Knuth Morris Pratt" << endl;
-  unique_ptr<vector<int>> piTable =
+  vector<int>* piTable =
       StringAlgorithms::knuthMorrisPrattBuildPiTable(destination);
   if (piTable == nullptr) {
     cerr << "Failed to build pitable";
@@ -170,7 +170,6 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  cout << "Choose" << endl;
   string choiceStr;
   cin >> choiceStr;
 
@@ -180,6 +179,9 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
   Road *road = parsed_txt.roads_umap.at(matchedRoads.at(choice)->getId());
+  cout << "Choose" << endl;
+  cout << "You chose " << choiceStr << ": " << road->getName() << endl;
+
   vector<Subroad *> subroads = road->getSubroads();
   if (subroads.size() == 0) {
     cerr << "This road doesn't have any subroads";
@@ -195,7 +197,12 @@ int main(int argc, char *argv[]) {
           "click the magnifying class (zoom to data)"
        << endl;
   cout << map_result << endl;
+
+  cout << "Press ENTER to continue";
+  cin.ignore();
+  getchar();
   // END OF KNUTH MORRIS PRATT
+
   // LENVENSHTEIN DISTANCE
   cout << endl << "Lenvenshtein Distance" << endl;
 
@@ -216,12 +223,13 @@ int main(int argc, char *argv[]) {
   index = 0;
   for (const auto &roadEditDistance : roadsEditDistance) {
       cout << index << ": " << roadEditDistance.distance << "-" << roadEditDistance.road->getName() << endl;
-      ++index;
       roadsSelector.insert({index, roadEditDistance});
+      ++index;
   }
 
   cout << "Choose" << endl;
   cin >> choiceStr;
+  cout << "You chose " << choiceStr << endl;
 
   choice = stoul(choiceStr, nullptr, 10);
   if (choice >= index) {
@@ -229,6 +237,9 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
   road = parsed_txt.roads_umap.at(roadsSelector.at(choice).road->getId());
+  cout << "Choose" << endl;
+  cout << "You chose " << choiceStr << ": " << road->getName() << endl;
+
   subroads = road->getSubroads();
   if (subroads.size() == 0) {
     cerr << "This road doesn't have any subroads";
@@ -244,7 +255,6 @@ int main(int argc, char *argv[]) {
        << endl;
   cout << map_result << endl;
   // END OF LENVENSHTEIN DISTANCE
-
   return EXIT_SUCCESS;
 }
 
@@ -337,7 +347,7 @@ static unique_ptr<Graph<Node>> buildGraph(
 }
 
 static string generate_overpass_map_query(list<Subroad *> &subroads_list) {
-  static stringstream url;
+  stringstream url;
   url << "(";
   for (auto &subroad_ptr : subroads_list) {
     Subroad::segment_t node_ids;

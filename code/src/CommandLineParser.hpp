@@ -10,15 +10,15 @@
 using std::string;
 using std::unordered_map;
 
-namespace std {
-template <class E>
-struct hash {
-  inline typename std::enable_if_t<std::is_enum<E>::value, int> operator()(
-      E const value) const {
-    return static_cast<typename std::underlying_type_t<E>>(value);
-  }
-};
-}
+// namespace std {
+// template <class E>
+// struct hash {
+//   inline typename std::enable_if_t<std::is_enum<E>::value, int> operator()(
+//       E const value) const {
+//     return static_cast<typename std::underlying_type_t<E>>(value);
+//   }
+// };
+// }
 
 class CommandLineParser {
  private:

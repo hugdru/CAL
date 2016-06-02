@@ -43,7 +43,7 @@ int StringAlgorithms::naiveAlternative(const string pattern,
 }
 int StringAlgorithms::knuthMorrisPratt(const string pattern,
                                        const string text) {
-  unique_ptr<vector<int>> piTable = knuthMorrisPrattBuildPiTable(pattern);
+  vector<int> *piTable = knuthMorrisPrattBuildPiTable(pattern);
 
   if (piTable == nullptr) {
     return -1;
@@ -51,7 +51,7 @@ int StringAlgorithms::knuthMorrisPratt(const string pattern,
   return knuthMorrisPratt(pattern, text, piTable);
 }
 
-int StringAlgorithms::knuthMorrisPratt(const string pattern, const string text, unique_ptr<vector<int>> const &piTable) {
+int StringAlgorithms::knuthMorrisPratt(const string pattern, const string text, vector<int> *piTable) {
   int patternLength = (int)pattern.length();
   int textLength = (int)text.length();
 
@@ -79,13 +79,13 @@ int StringAlgorithms::knuthMorrisPratt(const string pattern, const string text, 
   return -1;
 }
 
-unique_ptr<vector<int>> StringAlgorithms::knuthMorrisPrattBuildPiTable(
+vector<int>* StringAlgorithms::knuthMorrisPrattBuildPiTable(
     const string pattern) {
   int patternLength = (int)pattern.length();
   if (pattern.empty()) {
     return nullptr;
   }
-  unique_ptr<vector<int>> piTable = make_unique<vector<int>>(patternLength);
+  vector<int> *piTable = new vector<int>((size_t)patternLength);
 
   (*piTable)[0] = -1;
   int k = -1;

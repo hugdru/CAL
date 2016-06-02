@@ -12,7 +12,7 @@ class StringAlgorithms {
     static int naive(const string pattern, const string text);
     static int naiveAlternative(const string pattern, const string text);
     static int knuthMorrisPratt(const string pattern, const string text);
-    static int knuthMorrisPratt(const string pattern, const string text, unique_ptr<vector<int>> const &piTable);
-    static unique_ptr<vector<int>> knuthMorrisPrattBuildPiTable(const string pattern);
+    static int knuthMorrisPratt(const string pattern, const string text, vector<int> *piTable);
+    static vector<int>* knuthMorrisPrattBuildPiTable(const string pattern);
     static int dynamicProgrammingLevenshteinDistance(const string pattern, const string text);
 };
