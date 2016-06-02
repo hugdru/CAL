@@ -48,7 +48,10 @@ int StringAlgorithms::knuthMorrisPratt(const string pattern,
   if (piTable == nullptr) {
     return -1;
   }
-  return knuthMorrisPratt(pattern, text, piTable);
+
+  int ret = knuthMorrisPratt(pattern, text, piTable);
+  delete piTable;
+  return ret;
 }
 
 int StringAlgorithms::knuthMorrisPratt(const string pattern, const string text, vector<int> *piTable) {
@@ -89,7 +92,7 @@ vector<int>* StringAlgorithms::knuthMorrisPrattBuildPiTable(
 
   (*piTable)[0] = -1;
   int k = -1;
-  for (int i = 1; i <= patternLength; i++) {
+  for (int i = 1; i < patternLength; i++) {
     while (k >= 0 && pattern[(size_t)k + 1] != pattern[(size_t)i]) {
       k = (*piTable)[(size_t)k];
     }

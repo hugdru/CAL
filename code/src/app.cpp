@@ -164,6 +164,7 @@ int main(int argc, char *argv[]) {
       ++index;
     }
   }
+  delete(piTable);
 
   if (index == 0) {
     cerr << destination << " not found";

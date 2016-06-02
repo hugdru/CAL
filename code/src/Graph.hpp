@@ -187,6 +187,7 @@ class Graph {
       bool erase = false);
   vector<Vertex<T>*> getSources() const;
   void uniform_cost_search(const T& in, const T& goal);
+  ~Graph();
 };
 
 template <typename T>
@@ -211,6 +212,13 @@ bool Graph<T>::addVertex(const T& in) {
     return false;
   }
   return true;
+}
+
+template <typename T>
+Graph<T>::~Graph() {
+  for (auto &vertex : vertexSet) {
+    delete vertex;
+  }
 }
 
 template <typename T>
