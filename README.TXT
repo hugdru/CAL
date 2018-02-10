@@ -7,6 +7,12 @@
   4.3 Clicar em Run no menu
   4.4 Clicar na lupa de magnificação (zoom to data) no menu do mapa
   4.5 Comparar com a imagem respetiva imagem em ./code/run/*.png
+5. Segunda fase do trabalho
+    5.1 Escolher o destino pretendido, nome da rua.
+    5.2 Selecionar o destino pretendido através do identificador - Knuth Morris Pratt
+    5.3 Se pretendido copiar o output para o overpass de modo a ver o resultado
+    5.4 Selecionar o destino pretendido através do identificador - Pesquisa aproximada
+    5.5Se pretendido copiar o output para o overpass de modo a ver o resultado
 
 Sistema Operativo
   Ubuntu 16.04
